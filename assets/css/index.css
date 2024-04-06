@@ -1,8 +1,7 @@
 @media all and (max-width: 700px) {
     .logo img {
         width: 30%!important;
-    }
-    
+    }   
 }
 * {
     padding: 0;
