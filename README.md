@@ -1,5 +1,3 @@
-
-
 <h4>Авторы: RAD ClientSide</h4>
 <li>Mirjalol Ziyadullayev (Developer, Project Manager)</li>
 <li>Jasmina (Application Designer, Content Manager)</li>
