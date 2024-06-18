@@ -24,14 +24,17 @@
                   <img src="../assets/images/logos/dark-logo.svg" width="180" alt="">
                 </a>
                 <p class="text-center">Road to the Dream</p>
-                <form>
+                <div id="alertContainer" class="row">
+                  <!-- Alerts will be dynamically added here -->
+                </div>
+                <form id="loginForm">
                   <div class="mb-3">
-                    <label for="exampleInputEmail1" class="form-label">Номер телефона</label>
-                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                    <label for="phoneNumber" class="form-label">Номер телефона</label>
+                    <input type="text" class="form-control" id="phoneNumber" aria-describedby="phoneHelp">
                   </div>
                   <div class="mb-4">
-                    <label for="exampleInputPassword1" class="form-label">Пароль</label>
-                    <input type="password" class="form-control" id="exampleInputPassword1">
+                    <label for="password" class="form-label">Пароль</label>
+                    <input type="password" class="form-control" id="password">
                   </div>
                   <div class="d-flex align-items-center justify-content-between mb-4">
                     <div class="form-check">
@@ -42,9 +45,9 @@
                     </div>
                     <a class="text-primary fw-bold" href="./index.html">Забыли пароль ?</a>
                   </div>
-                  <a href="./index.html" class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Войти</a>
+                  <button type="submit" class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Войти</button>
                   <div class="d-flex align-items-center justify-content-center">
-                    <p class="fs-4 mb-0 fw-bold">Нет аккаунта  ?</p>
+                    <p class="fs-4 mb-0 fw-bold">Нет аккаунта ?</p>
                     <a class="text-primary fw-bold ms-2" href="./authentication-register.html">Создать аккаунт</a>
                   </div>
                 </form>
@@ -55,6 +58,7 @@
       </div>
     </div>
   </div>
+  <script src="../assets/js/auth-login.js"></script>
   <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
   <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>

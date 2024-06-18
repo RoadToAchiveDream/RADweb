@@ -17,6 +17,7 @@
       class="position-relative overflow-hidden radial-gradient min-vh-100 d-flex align-items-center justify-content-center">
       <div class="d-flex align-items-center justify-content-center w-100">
         <div class="row justify-content-center w-100">
+          
           <div class="col-md-8 col-lg-6 col-xxl-3">
             <div class="card mb-0">
               <div class="card-body">
@@ -24,33 +25,36 @@
                   <img src="../assets/images/logos/dark-logo.svg" width="180" alt="">
                 </a>
                 <p class="text-center">Road to the Dream</p>
-                <form>
+                <div id="alertContainer" class="row">
+                  <!-- Alerts will be dynamically added here -->
+                </div>
+                <form id="registrationForm">
                   <div class="mb-3">
-                    <label for="exampleInputtext1" class="form-label">Имя</label>
-                    <input type="text" class="form-control" id="exampleInputtext1" aria-describedby="textHelp">
+                    <label for="firstName" class="form-label">Имя</label>
+                    <input type="text" class="form-control" id="firstName" aria-describedby="textHelp">
                   </div>
                   <div class="mb-3">
-                    <label for="exampleInputtext1" class="form-label">Фамилия</label>
-                    <input type="text" class="form-control" id="exampleInputtext1" aria-describedby="textHelp">
+                    <label for="lastName" class="form-label">Фамилия</label>
+                    <input type="text" class="form-control" id="lastName" aria-describedby="textHelp">
                   </div>
                   <div class="mb-3">
-                    <label for="exampleInputEmail1" class="form-label">Адрес электронный почты</label>
-                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                    <label for="email" class="form-label">Адрес электронный почты</label>
+                    <input type="email" class="form-control" id="email" aria-describedby="emailHelp">
                   </div>
                   <div class="mb-3">
-                    <label for="exampleInputtext1" class="form-label">Номер телефона</label>
-                    <input type="text" class="form-control" id="exampleInputtext1" aria-describedby="textHelp">
+                    <label for="phoneNumber" class="form-label">Номер телефона</label>
+                    <input type="text" class="form-control" id="phoneNumber" aria-describedby="textHelp">
                   </div>
                   <div class="mb-4">
-                    <label for="exampleInputPassword1" class="form-label">Пароль</label>
-                    <input type="password" class="form-control" id="exampleInputPassword1">
+                    <label for="password" class="form-label">Пароль</label>
+                    <input type="password" class="form-control" id="password">
                   </div>
-                  <a href="./index.html" class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Создать аккаунт</a>
+                  <button type="submit" class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Создать аккаунт</button>
                   <div class="d-flex align-items-center justify-content-center">
                     <p class="fs-4 mb-0 fw-bold">Уже есть аккаунт?</p>
                     <a class="text-primary fw-bold ms-2" href="./authentication-login.html">Войти</a>
                   </div>
-                </form>
+                </form>                
               </div>
             </div>
           </div>
@@ -58,6 +62,7 @@
       </div>
     </div>
   </div>
+  <script src="../assets/js/auth-register.js"></script>
   <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
   <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
