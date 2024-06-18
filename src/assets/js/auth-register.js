@@ -29,27 +29,27 @@ document.getElementById('registrationForm').addEventListener('submit', function 
         },
         body: JSON.stringify(payload)
     })
-    .then(response => {
-        if (!response.ok) {
-            // Check if the response status is 400 or 500 (client or server error)
-            // Parse the response body as JSON
-            return response.json().then(err => {
-                throw new Error(err.message || JSON.stringify(err));
-            });
-        }
-        return response.json();
-    })
-    .then(data => {
-        // Handle successful response data
-        console.log(data);
-        // Redirect to home page on successful registration
-        window.location.href = './index.html';
-    })
-    .catch(error => {
-        console.error('Error:', error.message);
-        // Display error message in an alert
-        showAlert('danger', 'Ошибка:', error.message);
-    });
+        .then(response => {
+            if (!response.ok) {
+                // Check if the response status is 400 or 500 (client or server error)
+                // Parse the response body as JSON
+                return response.json().then(err => {
+                    throw new Error(err.message || JSON.stringify(err));
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Handle successful response data
+            console.log(data);
+            // Redirect to home page on successful registration
+            window.location.href = './index.html';
+        })
+        .catch(error => {
+            console.error('Error:', error.message);
+            // Display error message in an alert
+            showAlert('danger', 'Ошибка:', error.message);
+        });
 });
 
 // Function to show Bootstrap alert

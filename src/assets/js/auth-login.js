@@ -10,6 +10,9 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
     const params = { PhoneNumber: phoneNumber, Password: password };
     Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
 
+    // Clear previous alerts
+    clearAlerts();
+
     // Make GET request to the login endpoint
     fetch(url, {
         method: 'GET',
@@ -17,27 +20,27 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
             'Accept': '*/*'
         }
     })
-    .then(response => {
-        if (!response.ok) {
-            // If response is not ok, attempt to parse JSON error message
-            return response.json().then(err => {
-                throw new Error(`${err.message}`);
-            });
-        }
-        return response.json();
-    })
-    .then(data => {
-        // Handle successful response data
-        console.log(data);
-        // Redirect to home page on successful login
-        window.location.href = './index.html';
-    })
-    .catch(error => {
-        console.error('Error:', error.message);
-        // Display error message to the user or handle as needed
-        // Example: Show error message in an alert
-        showAlert('danger', 'Ошибка:', error.message);
-    });
+        .then(response => {
+            if (!response.ok) {
+                // If response is not ok, attempt to parse JSON error message
+                return response.json().then(err => {
+                    throw new Error(`${err.message}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Handle successful response data
+            console.log(data);
+            // Redirect to home page on successful login
+            window.location.href = './index.html';
+        })
+        .catch(error => {
+            console.error('Error:', error.message);
+            // Display error message to the user or handle as needed
+            // Example: Show error message in an alert
+            showAlert('danger', 'Ошибка:', error.message);
+        });
 });
 
 // Function to show Bootstrap alert
