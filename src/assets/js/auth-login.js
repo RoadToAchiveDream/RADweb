@@ -1,47 +1,55 @@
-document.getElementById('loginForm').addEventListener('submit', function (event) {
+async function loadSettings() {
+    try {
+        const response = await fetch('../settings.json');
+        if (!response.ok) {
+            throw new Error('Failed to load settings');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error loading settings:', error.message);
+        throw error;
+    }
+}
+
+
+document.getElementById('loginForm').addEventListener('submit', async function(event) {
     event.preventDefault();
 
-    // Get form values
     const phoneNumber = document.getElementById('phoneNumber').value;
     const password = document.getElementById('password').value;
 
-    // Create URL with query parameters
-    const url = new URL('https://localhost:7065/api/accounts/login');
-    const params = { PhoneNumber: phoneNumber, Password: password };
-    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+    try {
+        const settings = await loadSettings();
+        const loginUrl = `${settings.apiBaseUrl}/accounts/login?PhoneNumber=${encodeURIComponent(phoneNumber)}&Password=${encodeURIComponent(password)}`;
 
-    // Clear previous alerts
-    clearAlerts();
-
-    // Make GET request to the login endpoint
-    fetch(url, {
-        method: 'GET',
-        headers: {
-            'Accept': '*/*'
-        }
-    })
-        .then(response => {
-            if (!response.ok) {
-                // If response is not ok, attempt to parse JSON error message
-                return response.json().then(err => {
-                    throw new Error(`${err.message}`);
-                });
+        const response = await fetch(loginUrl, {
+            method: 'GET',
+            headers: {
+                'Accept': '*/*'
             }
-            return response.json();
-        })
-        .then(data => {
-            // Handle successful response data
-            console.log(data);
-            // Redirect to home page on successful login
-            window.location.href = './index.html';
-        })
-        .catch(error => {
-            console.error('Error:', error.message);
-            // Display error message to the user or handle as needed
-            // Example: Show error message in an alert
-            showAlert('danger', 'Ошибка:', error.message);
         });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Login failed');
+        }
+
+        const token = data.data; // Assuming token is in data field
+
+        // Store token in localStorage or sessionStorage
+        localStorage.setItem('token', token);
+
+        // Redirect to user profile page
+        window.location.href = './dashboard.html';
+    } catch (error) {
+        console.error('Login error:', error.message);
+
+        clearAlerts();
+        showAlert('danger', 'Ошибка:', error.message);
+    }
 });
+
 
 // Function to show Bootstrap alert
 function showAlert(type, title, message) {

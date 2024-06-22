@@ -1,4 +1,19 @@
-document.getElementById('registrationForm').addEventListener('submit', function (event) {
+async function loadSettings() {
+    try {
+        const response = await fetch('../settings.json');
+        if (!response.ok) {
+            throw new Error('Failed to load settings');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error loading settings:', error.message);
+        throw error;
+    }
+}
+
+
+
+document.getElementById('registrationForm').addEventListener('submit', async function (event) {
     event.preventDefault();
 
     // Get form values
@@ -17,40 +32,56 @@ document.getElementById('registrationForm').addEventListener('submit', function 
         lastName: lastName
     };
 
-    // Clear previous alerts
-    clearAlerts();
+    try {
+        const settings = await loadSettings();
+        const apiUrl = `${settings.apiBaseUrl}/users`;
 
-    // Make POST request to the registration endpoint
-    fetch('https://localhost:7065/api/users', {
-        method: 'POST',
-        headers: {
-            'Accept': '*/*',
-            'Content-Type': 'application/json-patch+json'
-        },
-        body: JSON.stringify(payload)
-    })
-        .then(response => {
-            if (!response.ok) {
-                // Check if the response status is 400 or 500 (client or server error)
-                // Parse the response body as JSON
-                return response.json().then(err => {
-                    throw new Error(err.message || JSON.stringify(err));
-                });
-            }
-            return response.json();
-        })
-        .then(data => {
-            // Handle successful response data
-            console.log(data);
-            // Redirect to home page on successful registration
-            window.location.href = './index.html';
-        })
-        .catch(error => {
-            console.error('Error:', error.message);
-            // Display error message in an alert
-            showAlert('danger', 'Ошибка:', error.message);
+        // Make POST request to the registration endpoint
+        const registrationResponse = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Accept': '*/*',
+                'Content-Type': 'application/json-patch+json'
+            },
+            body: JSON.stringify(payload)
         });
+
+        const data = await registrationResponse.json();
+
+        if (!registrationResponse.ok) {
+            throw new Error(data.message);
+        }
+
+        // Proceed with login using the registered phone number and password
+        const loginUrl = `${settings.apiBaseUrl}/accounts/login?PhoneNumber=${encodeURIComponent(phoneNumber)}&Password=${encodeURIComponent(password)}`;
+
+        const loginResponse = await fetch(loginUrl, {
+            method: 'GET',
+            headers: {
+                'Accept': '*/*'
+            }
+        });
+
+        const loginData = await loginResponse.json();
+
+        if (!loginResponse.ok) {
+            throw new Error(loginData.message || 'Login failed');
+        }
+
+        const token = loginData.data; // Assuming token is in data field
+
+        // Store token in localStorage or sessionStorage
+        localStorage.setItem('token', token);
+
+        // Redirect to home page on successful registration and login
+        window.location.href = './user-profile.html';
+    } catch (error) {
+        console.error('Error:', error.message);
+        clearAlerts();
+        showAlert('danger', 'Ошибка:', error.message);
+    }
 });
+
 
 // Function to show Bootstrap alert
 function showAlert(type, title, message) {
