@@ -1,4 +1,4 @@
-<!doctype html >
+<!doctype html>
 <html lang="en">
 
 <head>
@@ -131,112 +131,150 @@
             </header>
             <!--  Header End -->
             <div class="container-fluid">
-                    <div class="card-body mb-4">
-                        <h5 class="card-title fw-semibold mb-4">Мой профиль</h5>
-                        <div class="card mb-0 col-lg-6">
-                            <div class="card-body">
-                                <form>
-                                    <fieldset>
-                                        <legend>Персональные данные</legend>
-                                        <div class="mb-3">
-                                            <label for="userFirstname" class="form-label">Имя</label>
-                                            <input type="text" id="userFirstname" class="form-control"
-                                                placeholder="Loading..." disabled>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="userLastname" class="form-label">Фамилия</label>
-                                            <input type="text" id="userLastname" class="form-control"
-                                                placeholder="Loading..." disabled>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="userEmail" class="form-label">Адрес электронной почты</label>
-                                            <input type="text" id="userEmail" class="form-control"
-                                                placeholder="Loading..." disabled>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="userPhone" class="form-label">Телефонный номер</label>
-                                            <input type="text" id="userPhone" class="form-control"
-                                                placeholder="Loading..." disabled>
-                                        </div>
-                                    </fieldset>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title fw-semibold mb-4">Владение и контроль аккаунта</h5>
-                        <div class="card mb-0 col-lg-6">
-                            <div class="card-body">
-                                <div id="alertContainer" class="row">
-                                    <!-- Alerts will be dynamically added here -->
-                                </div>
+                <div class="card-body mb-4">
+                    <h5 class="card-title fw-semibold mb-4">Мой профиль</h5>
+                    <div class="card mb-0 col-lg-6">
+                        <div class="card-body">
+                            <form>
                                 <fieldset>
-                                    <legend></legend>
+                                    <legend>Персональные данные</legend>
                                     <div class="mb-3">
-                                        <button type="button" id="changePasswordButton" class="btn btn-info m-1"
-                                            data-bs-toggle="modal" data-bs-target="#changePasswordModal">Изменить
-                                            пароль</button>
+                                        <label for="userFirstname" class="form-label">Имя</label>
+                                        <input type="text" id="userFirstname" class="form-control"
+                                            placeholder="Loading..." disabled>
                                     </div>
                                     <div class="mb-3">
-                                        <button type="button" id="deleteUserButton" class="btn btn-danger m-1"
-                                            data-bs-toggle="modal" data-bs-target="#DeleteAccountModal">Удалить
-                                            аккаунт</button>
+                                        <label for="userLastname" class="form-label">Фамилия</label>
+                                        <input type="text" id="userLastname" class="form-control"
+                                            placeholder="Loading..." disabled>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="userEmail" class="form-label">Адрес электронной почты</label>
+                                        <input type="text" id="userEmail" class="form-control" placeholder="Loading..."
+                                            disabled>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="userPhone" class="form-label">Телефонный номер</label>
+                                        <input type="text" id="userPhone" class="form-control" placeholder="Loading..."
+                                            disabled>
+                                    </div>
+                                    <div class="d-flex justify-content-end">
+                                        <button type="button" id="editUserButton" class="btn btn-outline-info m-1"
+                                            data-bs-toggle="modal" data-bs-target="#editUserModal">Изменить
+                                            данные</button>
                                     </div>
                                 </fieldset>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title fw-semibold mb-4">Владение и контроль аккаунта</h5>
+                    <div class="card mb-0 col-lg-6">
+                        <div class="card-body">
+                            <div id="alertContainer" class="row">
+                                <!-- Alerts will be dynamically added here -->
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!--Delete Account Modal-->
-            <div class="modal fade" id="DeleteAccountModal" tabindex="-1" aria-labelledby="DeleteAccountModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog ">
-                    <div class="modal-content p-6">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="DeleteAccountModalLabel">Вы уверены ?</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <form id="deleteAccountForm">
-                                <label for="submit" class="form-label pb-1">Аккаунт будет удален навсегда !</label>
-                                <br>
-                                <button type="submit" class="btn btn-danger">Удалить</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Change Password Modal -->
-            <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog ">
-                    <div class="modal-content p-6">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="changePasswordModalLabel">Изменить пароль</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <form id="changePasswordForm">
+                            <fieldset>
+                                <legend></legend>
                                 <div class="mb-3">
-                                    <label for="oldPassword" class="form-label">Старый пароль</label>
-                                    <input type="password" class="form-control" id="oldPassword" required>
+                                    <button type="button" id="changePasswordButton" class="btn btn-info m-1"
+                                        data-bs-toggle="modal" data-bs-target="#changePasswordModal">Изменить
+                                        пароль</button>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="newPassword" class="form-label">Новый пароль</label>
-                                    <input type="password" class="form-control" id="newPassword" required>
+                                    <button type="button" id="deleteUserButton" class="btn btn-danger m-1"
+                                        data-bs-toggle="modal" data-bs-target="#DeleteAccountModal">Удалить
+                                        аккаунт</button>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="confirmPassword" class="form-label">Подтвердите новый пароль</label>
-                                    <input type="password" class="form-control" id="confirmPassword" required>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Изменить пароль</button>
-                            </form>
+                            </fieldset>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <!--Delete Account Modal-->
+        <div class="modal fade" id="DeleteAccountModal" tabindex="-1" aria-labelledby="DeleteAccountModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog ">
+                <div class="modal-content p-6">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="DeleteAccountModalLabel">Вы уверены ?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="deleteAccountForm">
+                            <label for="submit" class="form-label pb-1">Аккаунт будет удален навсегда !</label>
+                            <br>
+                            <button type="submit" class="btn btn-danger">Удалить</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Change Password Modal -->
+        <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog ">
+                <div class="modal-content p-6">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="changePasswordModalLabel">Изменить пароль</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="changePasswordForm">
+                            <div class="mb-3">
+                                <label for="oldPassword" class="form-label">Старый пароль</label>
+                                <input type="password" class="form-control" id="oldPassword" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="newPassword" class="form-label">Новый пароль</label>
+                                <input type="password" class="form-control" id="newPassword" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="confirmPassword" class="form-label">Подтвердите новый пароль</label>
+                                <input type="password" class="form-control" id="confirmPassword" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Изменить пароль</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Edit User Modal -->
+        <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content p-6">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editUserModalLabel">Изменить данные</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editUserForm">
+                            <div class="mb-3">
+                                <label for="firstName" class="form-label">Имя</label>
+                                <input type="text" class="form-control" id="firstName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="lastName" class="form-label">Фамилия</label>
+                                <input type="text" class="form-control" id="lastName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Адрес электронной почты</label>
+                                <input type="email" class="form-control" id="email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="phoneNumber" class="form-label">Телефонный номер</label>
+                                <input type="text" class="form-control" id="phoneNumber" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     </div>
     <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
     <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

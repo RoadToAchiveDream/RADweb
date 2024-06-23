@@ -1,12 +1,26 @@
+// Centralized function to get token from localStorage or redirect to login
+function getToken() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        redirectToLogin();
+        throw new Error('Token not found');
+    }
+    return token;
+}
+
+// Centralized error handling
+function handleError(error, context = 'Error') {
+    console.error(`${context}:`, error.message);
+    showAlert('danger', 'Ошибка:', error.message);
+}
+
 async function loadSettings() {
     try {
         const response = await fetch('../settings.json');
-        if (!response.ok) {
-            throw new Error('Failed to load settings');
-        }
+        if (!response.ok) throw new Error('Failed to load settings');
         return await response.json();
     } catch (error) {
-        console.error('Error loading settings:', error.message);
+        handleError(error, 'Error loading settings');
         throw error;
     }
 }
@@ -20,52 +34,61 @@ function parseJwt(token) {
         }).join(''));
         return JSON.parse(jsonPayload);
     } catch (error) {
-        console.error('JWT parsing error:', error.message);
+        handleError(error, 'JWT parsing error');
         throw error;
     }
 }
 
 async function fetchUserProfile() {
-    const token = localStorage.getItem('token');
-    if (!token) {
-        console.error('Token not found');
-        window.location.href = './authentication-login.html';
-        return;
-    }
-
     try {
+        const token = getToken();
         const userData = parseJwt(token);
-        console.log('User Profile Data:', userData);
-
-        document.getElementById('userFirstname').value = userData.firstname;
-        document.getElementById('userLastname').value = userData.lastname;
-        document.getElementById('userEmail').value = userData.email;
-        document.getElementById('userPhone').value = userData.phone_number;
-
-        document.getElementById('deleteAccountForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-            deleteUser(userData.id);
+        const settings = await loadSettings();
+        const response = await fetch(`${settings.apiBaseUrl}/users/${userData.id}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': '*/*'
+            }
         });
+
+        if (!response.ok) {
+            handleFetchError(response);
+            return;
+        }
+
+        const userProfile = await response.json();
+        populateUserProfile(userProfile.data);
+        setUpFormListeners(userData.id);
     } catch (error) {
-        console.error('Error parsing JWT or updating UI:', error.message);
-        clearAlerts();
-        showAlert('danger', 'Ошибка:', error.message);
+        handleError(error, 'Error fetching user profile');
     }
+}
+
+function populateUserProfile(userProfile) {
+    document.getElementById('userFirstname').value = userProfile.firstName;
+    document.getElementById('userLastname').value = userProfile.lastName;
+    document.getElementById('userEmail').value = userProfile.email;
+    document.getElementById('userPhone').value = userProfile.phoneNumber;
+}
+
+function setUpFormListeners(userId) {
+    document.getElementById('deleteAccountForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        deleteUser(userId);
+    });
+
+    document.getElementById('editUserForm').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        await editUser(userId);
+    });
 }
 
 async function deleteUser(userId) {
     try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            console.error('Token not found');
-            window.location.href = './authentication-login.html';
-            return;
-        }
-
+        const token = getToken();
         const settings = await loadSettings();
-        const deleteUrl = `${settings.apiBaseUrl}/users/${userId}`;
-
-        const response = await fetch(deleteUrl, {
+        const response = await fetch(`${settings.apiBaseUrl}/users/${userId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -73,65 +96,124 @@ async function deleteUser(userId) {
             }
         });
 
-        if (response.status === 401) {
-            throw new Error('Unauthorized access');
-        }
-
         if (!response.ok) {
-            throw new Error('Failed to delete user');
+            handleFetchError(response);
+            return;
         }
 
         console.log('User deleted successfully');
         localStorage.removeItem('token');
-        window.location.href = './authentication-login.html';
+        redirectToLogin();
     } catch (error) {
-        console.error('Error deleting user:', error.message);
-        clearAlerts();
-        showAlert('danger', 'Ошибка:', error.message);
+        handleError(error, 'Error deleting user');
     }
 }
 
 async function changePassword(oldPassword, newPassword) {
     try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            console.error('Token not found');
-            window.location.href = './authentication-login.html';
-            return;
-        }
-
+        const token = getToken();
         const userData = parseJwt(token);
-        const phoneNumber = userData.phone_number;
-
         const settings = await loadSettings();
-        const changePasswordUrl = `${settings.apiBaseUrl}/users/change-password?PhoneNumber=${encodeURIComponent(phoneNumber)}&OldPassword=${encodeURIComponent(oldPassword)}&NewPassword=${encodeURIComponent(newPassword)}`;
 
-        const response = await fetch(changePasswordUrl, {
-            method: 'PATCH',
+        // Fetch user profile to get phoneNumber
+        const userResponse = await fetch(`${settings.apiBaseUrl}/users/${userData.id}`, {
+            method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Accept': '*/*'
             }
         });
 
-        if (response.status === 401) {
-            throw new Error('Unauthorized access');
+        if (!userResponse.ok) {
+            handleFetchError(userResponse);
+            return;
         }
+
+        const userProfile = await userResponse.json();
+        const phoneNumber = encodeURIComponent(userProfile.data.phoneNumber); // Ensure phoneNumber is encoded
+
+        // Construct the change password endpoint with query parameters
+        const changePasswordUrl = `${settings.apiBaseUrl}/users/change-password?PhoneNumber=${phoneNumber}&OldPassword=${encodeURIComponent(oldPassword)}&NewPassword=${encodeURIComponent(newPassword)}`;
+
+        const response = await fetch(changePasswordUrl, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                'Accept': '*/*'
+            }
+        });
 
         if (!response.ok) {
-            throw new Error('Failed to change password');
+            handleFetchError(response);
+            return;
         }
 
-        clearAlerts();
         console.log('Password changed successfully');
         localStorage.removeItem('token');
         showAlert('success', 'Успех:', 'Пароль изменен успешно');
         $('#changePasswordModal').modal('hide');
+        redirectToLogin();
     } catch (error) {
-        console.error('Error changing password:', error.message);
-        clearAlerts();
-        showAlert('danger', 'Ошибка:', error.message);
+        handleError(error, 'Error changing password');
     }
+}
+
+async function editUser(userId) {
+    try {
+        const token = getToken();
+        const userData = {
+            firstName: document.getElementById('firstName').value,
+            lastName: document.getElementById('lastName').value,
+            email: document.getElementById('email').value,
+            phoneNumber: document.getElementById('phoneNumber').value
+        };
+
+        const settings = await loadSettings();
+        const response = await fetch(`${settings.apiBaseUrl}/users/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json-patch+json',
+                'Accept': '*/*'
+            },
+            body: JSON.stringify(userData)
+        });
+
+        if (!response.ok) {
+            handleFetchError(response);
+            return;
+        }
+
+        console.log('User updated successfully');
+        showAlert('success', 'Успех:', 'Данные пользователя успешно обновлены');
+        $('#editUserModal').modal('hide');
+
+        // Update token if it has changed
+        const newToken = response.headers.get('Authorization');
+        if (newToken && newToken !== token) {
+            localStorage.setItem('token', newToken);
+            console.log('Token updated after user update');
+        }
+
+        await fetchUserProfile(); // Reload the user profile with updated details
+    } catch (error) {
+        handleError(error, 'Error updating user');
+    }
+}
+
+function handleFetchError(response) {
+    if (response.status === 401) {
+        redirectToLogin();
+    } else {
+        console.error('Fetch error:', response.statusText);
+        showAlert('danger', 'Ошибка:', response.statusText);
+    }
+}
+
+function redirectToLogin() {
+    localStorage.removeItem('token');
+    window.location.href = './authentication-login.html';
 }
 
 document.getElementById('changePasswordForm').addEventListener('submit', async function (event) {
@@ -141,7 +223,6 @@ document.getElementById('changePasswordForm').addEventListener('submit', async f
     const confirmPassword = document.getElementById('confirmPassword').value;
 
     if (newPassword !== confirmPassword) {
-        clearAlerts();
         showAlert('danger', 'Ошибка:', 'Новые пароли не совпадают');
         return;
     }
@@ -151,7 +232,6 @@ document.getElementById('changePasswordForm').addEventListener('submit', async f
 
 function showAlert(type, title, message) {
     const alertContainer = document.getElementById('alertContainer');
-
     if (!alertContainer) {
         console.error('Alert container not found');
         return;
@@ -160,13 +240,19 @@ function showAlert(type, title, message) {
     const alert = document.createElement('div');
     alert.classList.add('alert', `alert-${type}`, 'alert-dismissible', 'fade', 'show');
     alert.setAttribute('role', 'alert');
-
     alert.innerHTML = `
         <strong>${title}</strong> ${message}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
 
     alertContainer.appendChild(alert);
+
+    setTimeout(() => {
+        alert.classList.remove('show');
+        setTimeout(() => {
+            if (alert.parentElement) alert.parentElement.removeChild(alert);
+        }, 150);
+    }, 5000);
 }
 
 function clearAlerts() {
