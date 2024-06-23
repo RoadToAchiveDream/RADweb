@@ -11,7 +11,6 @@ async function loadSettings() {
     }
 }
 
-
 document.getElementById('loginForm').addEventListener('submit', async function(event) {
     event.preventDefault();
 
@@ -29,6 +28,11 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
             }
         });
 
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Unexpected response format');
+        }
+
         const data = await response.json();
 
         if (!response.ok) {
@@ -41,7 +45,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         localStorage.setItem('token', token);
 
         // Redirect to user profile page
-        window.location.href = './dashboard.html';
+        window.location.href = './user-profile.html';
     } catch (error) {
         console.error('Login error:', error.message);
 
@@ -49,7 +53,6 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         showAlert('danger', 'Ошибка:', error.message);
     }
 });
-
 
 // Function to show Bootstrap alert
 function showAlert(type, title, message) {
