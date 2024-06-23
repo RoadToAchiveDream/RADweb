@@ -39,13 +39,11 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
             throw new Error(data.message || 'Login failed');
         }
 
-        const token = data.data; // Assuming token is in data field
+        const token = data.data;
 
-        // Store token in localStorage or sessionStorage
         localStorage.setItem('token', token);
 
-        // Redirect to user profile page
-        window.location.href = './user-profile.html';
+        window.location.href = './dashboard.html';
     } catch (error) {
         console.error('Login error:', error.message);
 
@@ -54,7 +52,6 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
     }
 });
 
-// Function to show Bootstrap alert
 function showAlert(type, title, message) {
     const alertContainer = document.getElementById('alertContainer');
 
@@ -70,8 +67,7 @@ function showAlert(type, title, message) {
     alertContainer.appendChild(alert);
 }
 
-// Function to clear all alerts
 function clearAlerts() {
     const alertContainer = document.getElementById('alertContainer');
-    alertContainer.innerHTML = ''; // Clear all child elements
+    alertContainer.innerHTML = '';
 }

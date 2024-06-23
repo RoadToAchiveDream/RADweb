@@ -11,19 +11,15 @@ async function loadSettings() {
     }
 }
 
-
-
 document.getElementById('registrationForm').addEventListener('submit', async function (event) {
     event.preventDefault();
 
-    // Get form values
     const firstName = document.getElementById('firstName').value;
     const lastName = document.getElementById('lastName').value;
     const email = document.getElementById('email').value;
     const phoneNumber = document.getElementById('phoneNumber').value;
     const password = document.getElementById('password').value;
 
-    // Create request payload
     const payload = {
         email: email,
         password: password,
@@ -36,7 +32,6 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
         const settings = await loadSettings();
         const apiUrl = `${settings.apiBaseUrl}/users`;
 
-        // Make POST request to the registration endpoint
         const registrationResponse = await fetch(apiUrl, {
             method: 'POST',
             headers: {
@@ -46,13 +41,18 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
             body: JSON.stringify(payload)
         });
 
+
+        const contentType = registrationResponse.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Unexpected response format');
+        }
+
         const data = await registrationResponse.json();
 
         if (!registrationResponse.ok) {
             throw new Error(data.message);
         }
 
-        // Proceed with login using the registered phone number and password
         const loginUrl = `${settings.apiBaseUrl}/accounts/login?PhoneNumber=${encodeURIComponent(phoneNumber)}&Password=${encodeURIComponent(password)}`;
 
         const loginResponse = await fetch(loginUrl, {
@@ -68,12 +68,10 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
             throw new Error(loginData.message || 'Login failed');
         }
 
-        const token = loginData.data; // Assuming token is in data field
+        const token = loginData.data;
 
-        // Store token in localStorage or sessionStorage
         localStorage.setItem('token', token);
 
-        // Redirect to home page on successful registration and login
         window.location.href = './user-profile.html';
     } catch (error) {
         console.error('Error:', error.message);
@@ -82,8 +80,6 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
     }
 });
 
-
-// Function to show Bootstrap alert
 function showAlert(type, title, message) {
     const alertContainer = document.getElementById('alertContainer');
 
@@ -99,8 +95,7 @@ function showAlert(type, title, message) {
     alertContainer.appendChild(alert);
 }
 
-// Function to clear all alerts
 function clearAlerts() {
     const alertContainer = document.getElementById('alertContainer');
-    alertContainer.innerHTML = ''; // Clear all child elements
+    alertContainer.innerHTML = '';
 }
