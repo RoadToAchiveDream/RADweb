@@ -1,26 +1,34 @@
-// Centralized function to get token from localStorage or redirect to login
 function getToken() {
     const token = localStorage.getItem('token');
     if (!token) {
         redirectToLogin();
-        throw new Error('Token not found');
+        throw new Error('Токен не найден');
+    }
+    if (isTokenExpired(token)) {
+        redirectToLogin();
+        throw new Error('Токен посрочен');
     }
     return token;
 }
 
-// Centralized error handling
-function handleError(error, context = 'Error') {
-    console.error(`${context}:`, error.message);
-    showAlert('danger', 'Ошибка:', error.message);
+function isTokenExpired(token) {
+    try {
+        const decodedToken = parseJwt(token);
+        const currentTime = Math.floor(Date.now() / 1000);
+        return decodedToken.exp < currentTime;
+    } catch (error) {
+        console.error('Не удалось анализировать токен:', error.message);
+        return true;
+    }
 }
 
 async function loadSettings() {
     try {
         const response = await fetch('../settings.json');
-        if (!response.ok) throw new Error('Failed to load settings');
+        if (!response.ok) throw new Error('Не удалось загрузить settings.json');
         return await response.json();
     } catch (error) {
-        handleError(error, 'Error loading settings');
+        console.error('Ошибка при загрузки settings.json', error.message);
         throw error;
     }
 }
@@ -34,7 +42,7 @@ function parseJwt(token) {
         }).join(''));
         return JSON.parse(jsonPayload);
     } catch (error) {
-        handleError(error, 'JWT parsing error');
+        console.error('JWT parsing error', error.message);
         throw error;
     }
 }
@@ -53,15 +61,17 @@ async function fetchUserProfile() {
         });
 
         if (!response.ok) {
-            handleFetchError(response);
-            return;
+            const responseData = await response.json();
+            throw new Error(responseData.message);
         }
 
         const userProfile = await response.json();
         populateUserProfile(userProfile.data);
         setUpFormListeners(userData.id);
     } catch (error) {
-        handleError(error, 'Error fetching user profile');
+        console.error('Error:', error.message);
+        clearAlerts();
+        showAlert('danger', 'Ошибка:', error.message);
     }
 }
 
@@ -97,15 +107,17 @@ async function deleteUser(userId) {
         });
 
         if (!response.ok) {
-            handleFetchError(response);
-            return;
+            const responseData = await response.json();
+            throw new Error(responseData.message);
         }
 
-        console.log('User deleted successfully');
+        console.log('Аккаун успешно удален');
         localStorage.removeItem('token');
         redirectToLogin();
     } catch (error) {
-        handleError(error, 'Error deleting user');
+        console.error('Error:', error.message);
+        clearAlerts();
+        showAlert('danger', 'Ошибка:', error.message);
     }
 }
 
@@ -115,7 +127,6 @@ async function changePassword(oldPassword, newPassword) {
         const userData = parseJwt(token);
         const settings = await loadSettings();
 
-        // Fetch user profile to get phoneNumber
         const userResponse = await fetch(`${settings.apiBaseUrl}/users/${userData.id}`, {
             method: 'GET',
             headers: {
@@ -125,14 +136,18 @@ async function changePassword(oldPassword, newPassword) {
         });
 
         if (!userResponse.ok) {
-            handleFetchError(userResponse);
-            return;
+            const userProfile = await userResponse.json();
+            throw new Error(userProfile.message);
         }
 
         const userProfile = await userResponse.json();
-        const phoneNumber = encodeURIComponent(userProfile.data.phoneNumber); // Ensure phoneNumber is encoded
+        const phoneNumber = encodeURIComponent(userProfile.data.phoneNumber);
+        const requestBody = {
+            phoneNumber: phoneNumber,
+            oldPassword: oldPassword,
+            newPassword: newPassword
+        };
 
-        // Construct the change password endpoint with query parameters
         const changePasswordUrl = `${settings.apiBaseUrl}/users/change-password?PhoneNumber=${phoneNumber}&OldPassword=${encodeURIComponent(oldPassword)}&NewPassword=${encodeURIComponent(newPassword)}`;
 
         const response = await fetch(changePasswordUrl, {
@@ -141,23 +156,29 @@ async function changePassword(oldPassword, newPassword) {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
                 'Accept': '*/*'
-            }
+            },
+            body: JSON.stringify(requestBody)
         });
 
+        const responseData = await response.json();
+
         if (!response.ok) {
-            handleFetchError(response);
-            return;
+            throw new Error(responseData.message);
         }
 
-        console.log('Password changed successfully');
+        console.log('Пароль успешно обновлен');
         localStorage.removeItem('token');
-        showAlert('success', 'Успех:', 'Пароль изменен успешно');
+        clearAlerts();
+        showAlert('success', 'Успех:', responseData.message);
         $('#changePasswordModal').modal('hide');
         redirectToLogin();
     } catch (error) {
-        handleError(error, 'Error changing password');
+        console.error('Error:', error.message);
+        clearAlerts();
+        showAlert('danger', 'Ошибка:', error.message);
     }
 }
+
 
 async function editUser(userId) {
     try {
@@ -180,36 +201,25 @@ async function editUser(userId) {
             body: JSON.stringify(userData)
         });
 
+        var responseData = await response.json();
+
         if (!response.ok) {
-            handleFetchError(response);
-            return;
+            throw new Error(responseData.message);
         }
 
-        console.log('User updated successfully');
-        showAlert('success', 'Успех:', 'Данные пользователя успешно обновлены');
+        console.log('Данные пользователя успешно обновлены');
+        clearAlerts();
+        showAlert('success', 'Успех:', responseData.message);
         $('#editUserModal').modal('hide');
 
-        // Update token if it has changed
-        const newToken = response.headers.get('Authorization');
-        if (newToken && newToken !== token) {
-            localStorage.setItem('token', newToken);
-            console.log('Token updated after user update');
-        }
-
-        await fetchUserProfile(); // Reload the user profile with updated details
+        await fetchUserProfile();
     } catch (error) {
-        handleError(error, 'Error updating user');
+        console.error('Error:', error.message);
+        clearAlerts();
+        showAlert('danger', 'Ошибка:', error.message);
     }
 }
 
-function handleFetchError(response) {
-    if (response.status === 401) {
-        redirectToLogin();
-    } else {
-        console.error('Fetch error:', response.statusText);
-        showAlert('danger', 'Ошибка:', response.statusText);
-    }
-}
 
 function redirectToLogin() {
     localStorage.removeItem('token');
@@ -223,12 +233,14 @@ document.getElementById('changePasswordForm').addEventListener('submit', async f
     const confirmPassword = document.getElementById('confirmPassword').value;
 
     if (newPassword !== confirmPassword) {
+        clearAlerts();
         showAlert('danger', 'Ошибка:', 'Новые пароли не совпадают');
         return;
     }
 
     await changePassword(oldPassword, newPassword);
 });
+
 
 function showAlert(type, title, message) {
     const alertContainer = document.getElementById('alertContainer');
