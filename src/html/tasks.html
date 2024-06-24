@@ -135,10 +135,30 @@
       </header>
       <!--  Header End -->
       <div class="container-fluid">
-        <div class="card">
+        <div class="container-fluid">
           <div class="card-body">
-            <h5 class="card-title fw-semibold mb-4">Sample Page</h5>
-            <p class="mb-0">This is a sample page </p>
+            <h5 class="card-title fw-semibold mb-4">Создать новую задачу</h5>
+            <div class="card">
+              <div class="card-body">
+                <form id="createTaskForm">
+                  <div class="mb-3">
+                    <label for="inputTaskTitle" class="form-label">Заголовок</label>
+                    <input type="text" class="form-control" id="inputTaskTitle" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="inputTaskDescription" class="form-label">Описание</label>
+                    <input type="text" class="form-control" id="inputTaskDescription" required>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Создать</button>
+                </form>
+              </div>
+            </div>
+            <div id="alertContainer" class="row">
+              <!-- Alerts will be dynamically added here -->
+            </div>
+            <h5 class="card-title fw-semibold mb-4">Все задачи</h5>
+            <div id="tasksList">
+            </div>
           </div>
         </div>
       </div>
@@ -147,6 +167,7 @@
   <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
   <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../assets/js/sidebarmenu.js"></script>
+  <script src="../assets/js/tasks.js"></script>
   <script src="../assets/js/app.min.js"></script>
   <script src="../assets/js/log-out.js"></script>
   <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
