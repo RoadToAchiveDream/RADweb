@@ -1,10 +1,11 @@
 <h4>Авторы: RAD ClientSide</h4>
 <li>Mirjalol Ziyadullayev (Developer, Project Manager)</li>
 <li>Habibullo Abdullayev (QA tester)</li>
-<li>Jasmina (Application Designer, Content Manager)</li>
+
 <h4>Авторы: RAD ServerSide</h4>
 <li>Mirjalol Ziyadullayev (Developer, Project Manager)</li>
 <li>Shoxsanam Abdujabborova (Developer)</li>
+
 <h4>Владелец:</h4>
 <li>Mirjalol Ziyadullayev</li>
 <br>
