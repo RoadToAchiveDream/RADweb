@@ -1,3 +1,5 @@
+<img src="src/assets/images/logos/dark-logo.png" alt="there was an image" width="70"/>
+
 <h4>Авторы: RAD ClientSide</h4>
 <li>Mirjalol Ziyadullayev (Developer, Project Manager)</li>
 <li>Habibullo Abdullayev (QA tester)</li>
