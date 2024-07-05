@@ -177,13 +177,21 @@ async function getNoteById(noteId) {
 
         const note = await response.json();
         console.log('Note:', note.data);
-        // Display note details in the UI
+
+        // Populate modal with note details
+        document.getElementById('modalNoteTitle').value = note.data.title;
+        document.getElementById('modalNoteDescription').value = note.data.content;
+
+        // Show the modal
+        const noteModal = new bootstrap.Modal(document.getElementById('noteModal'));
+        noteModal.show();
     } catch (error) {
         console.error('Error:', error.message);
         clearAlerts();
         showAlert('danger', 'Ошибка:', error.message);
     }
 }
+
 
 async function getAllNotes() {
     try {
@@ -224,18 +232,24 @@ function displayNotes(notes) {
         notesList.appendChild(alertItem);
         return;
     }
+
+    // Create a row to contain note items
+    const row = document.createElement('div');
+    row.className = 'row row-cols-1 row-cols-lg-3 g-3'; // Bootstrap grid classes
+
     notes.forEach(note => {
+        // Create a column div for each note item
+        const colDiv = document.createElement('div');
+        colDiv.className = 'col'; // Each note item takes full width on small screens and 1/3 width on large screens
+
+        // Create the note item card
         const noteItem = document.createElement('div');
         noteItem.className = 'note-item card';
         noteItem.innerHTML = `
             <div class="card-body">
                 <div class="mb-3">
-                    <label class="form-label">Задача</label>
+                    <label class="form-label">Заметка</label>
                     <input type="text" class="form-control" value="${note.title}" disabled>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Описание</label>
-                    <input type="text" class="form-control" value="${note.content}" disabled>
                 </div>
                 <div class="d-flex justify-content-between">
                     <button class="btn btn-info" onclick="getNoteById(${note.id})">Просмотр</button>
@@ -243,9 +257,18 @@ function displayNotes(notes) {
                 </div>
             </div>
         `;
-        notesList.appendChild(noteItem);
+
+        // Append the note item to the column div
+        colDiv.appendChild(noteItem);
+
+        // Append the column div to the row
+        row.appendChild(colDiv);
     });
+
+    // Append the row to the notesList
+    notesList.appendChild(row);
 }
+
 
 
 document.addEventListener('DOMContentLoaded', () => {

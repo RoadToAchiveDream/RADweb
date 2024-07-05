@@ -225,7 +225,13 @@ function displayTasks(tasks) {
         return;
     }
 
+    const row = document.createElement('div');
+    row.className = 'row row-cols-1 row-cols-lg-3 g-3'; // Bootstrap grid classes
+
     tasks.forEach(task => {
+        const colDiv = document.createElement('div');
+        colDiv.className = 'col'; // Each task item takes full width on small screens and 1/3 width on large screens
+
         const taskItem = document.createElement('div');
         taskItem.className = 'task-item card';
         taskItem.innerHTML = `
@@ -244,9 +250,16 @@ function displayTasks(tasks) {
                 </div>
             </div>
         `;
-        tasksList.appendChild(taskItem);
+        colDiv.appendChild(taskItem);
+
+        // Append the column div to the row
+        row.appendChild(colDiv);
     });
+
+    // Append the row to the tasksList
+    tasksList.appendChild(row);
 }
+
 
 
 document.addEventListener('DOMContentLoaded', () => {
