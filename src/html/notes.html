@@ -53,7 +53,7 @@
             <li class="sidebar-item">
               <a class="sidebar-link" href="./tasks.html" aria-expanded="false">
                 <span>
-                  <i class="ti ti-list-check"></i>
+                   <i class="ti ti-list-check"></i>
                 </span>
                 <span class="hide-menu">Задачи</span>
               </a>
@@ -138,16 +138,16 @@
         <div class="container-fluid">
           <div class="card-body">
             <h5 class="card-title fw-semibold mb-4">Создать новую заметку</h5>
-            <div class="card">
+            <div class="card col-lg-6">
               <div class="card-body">
                 <form id="createNoteForm">
                   <div class="mb-3">
-                    <label for="inputNoteTitle" class="form-label">Загаловок</label>
-                    <input type="text" class="form-control" id="inputNoteTitle" required>
+                    <label for="inputNoteTitle" class="form-label">Титул</label>
+                    <input type="text" class="form-control" id="inputNoteTitle" required maxlength="256">
                   </div>
                   <div class="mb-3">
-                    <label for="inputNoteDescription" class="form-label">Описание</label>
-                    <input type="text" class="form-control" id="inputNoteDescription" required>
+                    <label for="inputNoteDescription" class="form-label">Заметка</label>
+                    <textarea class="form-control" id="inputNoteDescription" required style="height: 100px"></textarea>
                   </div>
                   <button type="submit" class="btn btn-primary ">Создать</button>
                 </form>
@@ -158,21 +158,18 @@
             </div>
             <!-- Modal -->
             <div class="modal fade" id="noteModal" tabindex="-1" aria-labelledby="noteModalLabel" aria-hidden="true">
-              <div class="modal-dialog">
+              <div class="modal-dialog modal-dialog-centered modal-lg-4">
                 <div class="modal-content">
-                  <div class="modal-header">
+                  <!-- <div class="modal-header">
                     <h5 class="modal-title" id="noteModalLabel">Детали заметки</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
+                  </div> -->
                   <div class="modal-body">
-                    <div class="mb-3">
-                      <label for="modalNoteTitle" class="form-label">Заметка</label>
-                      <input type="text" class="form-control" id="modalNoteTitle" disabled>
-                    </div>
-                    <div class="mb-3">
-                      <label for="modalNoteDescription" class="form-label">Описание</label>
-                      <input type="text" class="form-control" id="modalNoteDescription" disabled>
-                    </div>
+                    <h6 class="card-title fw-bold">Титул:</h6>
+                    <p id="modalNoteTitle" class="card-text m-1 mb-3"></p>
+
+                    <h6 class="card-title fw-bold mb-2">Заметка:</h6>
+                    <textarea id="modalNoteDescription" class="form-control" style="height: 200px; resize: none;"
+                      disabled></textarea>
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-outline-info" data-bs-dismiss="modal">Закрыть</button>
@@ -180,6 +177,7 @@
                 </div>
               </div>
             </div>
+
             <h5 class="card-title fw-semibold mb-4">Все заметки</h5>
             <div id="notesList">
             </div>
@@ -192,6 +190,7 @@
         </div>
       </div>
     </div>
+  </div>
   </div>
   <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
   <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

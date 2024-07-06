@@ -166,7 +166,7 @@ async function getNoteById(noteId) {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
-                'Accept': '*/*'
+                'Accept': 'application/json'
             }
         });
 
@@ -179,8 +179,8 @@ async function getNoteById(noteId) {
         console.log('Note:', note.data);
 
         // Populate modal with note details
-        document.getElementById('modalNoteTitle').value = note.data.title;
-        document.getElementById('modalNoteDescription').value = note.data.content;
+        document.getElementById('modalNoteTitle').textContent = note.data.title;
+        document.getElementById('modalNoteDescription').textContent = note.data.content;
 
         // Show the modal
         const noteModal = new bootstrap.Modal(document.getElementById('noteModal'));
@@ -191,6 +191,7 @@ async function getNoteById(noteId) {
         showAlert('danger', 'Ошибка:', error.message);
     }
 }
+
 
 
 async function getAllNotes(page = 1) {
@@ -213,13 +214,13 @@ async function getAllNotes(page = 1) {
 
         const notes = await response.json();
         const paginationHeader = response.headers.get('x-pagination');
-        
+
         if (!paginationHeader) {
             throw new Error('Pagination metadata missing in response');
         }
 
         const paginationMeta = JSON.parse(paginationHeader);
-        
+
         displayNotes(notes.data);
         updatePagination(paginationMeta);
     } catch (error) {
@@ -289,26 +290,85 @@ function updatePagination(paginationMeta) {
 
     const currentPage = paginationMeta.CurrentPage || 1;
     const totalPages = paginationMeta.TotalPages;
+    const maxVisiblePages = 3; // Maximum number of page links to display
 
-    const prevButton = createPaginationButton('Предыдущий', currentPage > 1, currentPage - 1);
+    const prevButton = createPaginationButton('ti ti-arrow-big-left-line', currentPage > 1, currentPage - 1);
     paginationContainer.appendChild(prevButton);
 
-    for (let i = 1; i <= totalPages; i++) {
-        const pageButton = createPaginationButton(i, true, i);
-        paginationContainer.appendChild(pageButton);
+    if (totalPages <= maxVisiblePages) {
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = createPaginationButton(null, true, i, currentPage === i);
+            paginationContainer.appendChild(pageButton);
+        }
+    } else {
+        let startPage, endPage;
+        if (currentPage <= Math.floor(maxVisiblePages / 2)) {
+            startPage = 1;
+            endPage = maxVisiblePages;
+        } else if (currentPage + Math.floor(maxVisiblePages / 2) >= totalPages) {
+            startPage = totalPages - maxVisiblePages + 1;
+            endPage = totalPages;
+        } else {
+            startPage = currentPage - Math.floor(maxVisiblePages / 2);
+            endPage = currentPage + Math.floor(maxVisiblePages / 2);
+        }
+
+        if (startPage > 1) {
+            const firstPageButton = createPaginationButton(null, true, 1, currentPage === 1);
+            paginationContainer.appendChild(firstPageButton);
+
+            const ellipsis = document.createElement('div');
+            ellipsis.className = 'page-item disabled';
+            ellipsis.innerHTML = '<a class="page-link btn btn-light m-1">...</a>';
+            paginationContainer.appendChild(ellipsis);
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            const pageButton = createPaginationButton(null, true, i, currentPage === i);
+            paginationContainer.appendChild(pageButton);
+        }
+
+        if (endPage < totalPages) {
+            const ellipsis = document.createElement('div');
+            ellipsis.className = 'page-item disabled';
+            ellipsis.innerHTML = '<a class="page-link btn btn-light m-1">...</a>';
+            paginationContainer.appendChild(ellipsis);
+
+            const lastPageButton = createPaginationButton(null, true, totalPages, currentPage === totalPages);
+            paginationContainer.appendChild(lastPageButton);
+        }
     }
 
-    const nextButton = createPaginationButton('Следующий', currentPage < totalPages, currentPage + 1);
+    const nextButton = createPaginationButton('ti ti-arrow-big-right-line', currentPage < totalPages, currentPage + 1);
     paginationContainer.appendChild(nextButton);
 }
 
-function createPaginationButton(text, isEnabled, page) {
-    const li = document.createElement('li');
-    li.className = 'page-item' + (isEnabled ? '' : ' disabled');
+function createPaginationButton(iconClass, isEnabled, page, isActive = false) {
+    const li = document.createElement('div');
+    li.className = 'page-item m-1' + (isActive ? ' active' : '') + (isEnabled ? '' : ' disabled');
+
     const a = document.createElement('a');
-    a.className = 'page-link';
+    a.className = 'page-link btn btn-light';
     a.href = '#';
-    a.textContent = text;
+
+    if (iconClass) {
+        const icon = document.createElement('i');
+        icon.className = iconClass;
+
+        if (iconClass !== 'ti ti-arrow-big-left-line' && iconClass !== 'ti ti-arrow-big-right-line') {
+            a.textContent = page;
+            a.prepend(icon);
+        } else {
+            a.appendChild(icon);
+        }
+    } else {
+        a.textContent = page; // Set the page number as text content of the anchor
+    }
+
+    if (isActive) {
+        a.className = 'page-link btn';
+    }
+
     if (isEnabled) {
         a.onclick = () => {
             getAllNotes(page);
@@ -318,9 +378,12 @@ function createPaginationButton(text, isEnabled, page) {
             event.preventDefault();
         };
     }
+
     li.appendChild(a);
     return li;
 }
+
+
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('createNoteForm').addEventListener('submit', async (event) => {
