@@ -110,12 +110,6 @@
                 <i class="ti ti-menu-2"></i>
               </a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link nav-icon-hover" href="javascript:void(0)">
-                <i class="ti ti-bell-ringing"></i>
-                <div class="notification bg-primary rounded-circle"></div>
-              </a>
-            </li>
           </ul>
           <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
             <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
@@ -144,16 +138,16 @@
         <div class="container-fluid">
           <div class="card-body">
             <h5 class="card-title fw-semibold mb-4">Создать новую задачу</h5>
-            <div class="card">
+            <div class="card col-lg-6">
               <div class="card-body">
                 <form id="createTaskForm">
                   <div class="mb-3">
                     <label for="inputTaskTitle" class="form-label">Заголовок</label>
-                    <input type="text" class="form-control" id="inputTaskTitle" required>
+                    <input type="text" class="form-control" id="inputTaskTitle" required maxlength="256">
                   </div>
                   <div class="mb-3">
                     <label for="inputTaskDescription" class="form-label">Описание</label>
-                    <input type="text" class="form-control" id="inputTaskDescription" required>
+                    <textarea class="form-control" id="inputTaskDescription" required style="height: 100px"></textarea>
                   </div>
                   <button type="submit" class="btn btn-primary">Создать</button>
                 </form>
@@ -165,15 +159,6 @@
             <h5 class="card-title fw-semibold mb-4">Все задачи</h5>
             <div id="tasksList">
             </div>
-            <nav aria-label="Page navigation example">
-              <ul class="pagination">
-                <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item"><a class="page-link" href="#">Next</a></li>
-              </ul>
-            </nav>
           </div>
         </div>
       </div>
