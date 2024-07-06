@@ -193,12 +193,12 @@ async function getNoteById(noteId) {
 }
 
 
-async function getAllNotes() {
+async function getAllNotes(page = 1) {
     try {
         const token = getToken();
         const settings = await loadSettings();
 
-        const response = await fetch(`${settings.apiBaseUrl}/notes?PageIndex=1&PageSize=20&OrderBy=id&OrderType=desc`, {
+        const response = await fetch(`${settings.apiBaseUrl}/notes?PageIndex=${page}&PageSize=20&OrderBy=id&OrderType=desc`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -208,11 +208,20 @@ async function getAllNotes() {
 
         if (!response.ok) {
             const responseData = await response.json();
-            throw new Error(responseData.message || 'Failed to get notes');
+            throw new Error(responseData.message);
         }
 
         const notes = await response.json();
+        const paginationHeader = response.headers.get('x-pagination');
+        
+        if (!paginationHeader) {
+            throw new Error('Pagination metadata missing in response');
+        }
+
+        const paginationMeta = JSON.parse(paginationHeader);
+        
         displayNotes(notes.data);
+        updatePagination(paginationMeta);
     } catch (error) {
         console.error('Error:', error.message);
         clearAlerts();
@@ -252,8 +261,8 @@ function displayNotes(notes) {
                     <input type="text" class="form-control" value="${note.title}" disabled>
                 </div>
                 <div class="d-flex justify-content-between">
-                    <button class="btn btn-info" onclick="getNoteById(${note.id})">Просмотр</button>
-                    <button class="btn btn-danger" onclick="deleteNote(${note.id})">Удалить</button>
+                    <button class="btn btn-secondary ti ti-eye" onclick="getNoteById(${note.id})"></button>
+                    <button class="btn btn-danger ti ti-trash" onclick="deleteNote(${note.id})"></button>
                 </div>
             </div>
         `;
@@ -269,7 +278,49 @@ function displayNotes(notes) {
     notesList.appendChild(row);
 }
 
+function updatePagination(paginationMeta) {
+    const paginationContainer = document.getElementById('pagination');
+    paginationContainer.innerHTML = '';
 
+    if (!paginationMeta || !paginationMeta.TotalPages) {
+        console.error('Pagination metadata is missing or incomplete.');
+        return;
+    }
+
+    const currentPage = paginationMeta.CurrentPage || 1;
+    const totalPages = paginationMeta.TotalPages;
+
+    const prevButton = createPaginationButton('Предыдущий', currentPage > 1, currentPage - 1);
+    paginationContainer.appendChild(prevButton);
+
+    for (let i = 1; i <= totalPages; i++) {
+        const pageButton = createPaginationButton(i, true, i);
+        paginationContainer.appendChild(pageButton);
+    }
+
+    const nextButton = createPaginationButton('Следующий', currentPage < totalPages, currentPage + 1);
+    paginationContainer.appendChild(nextButton);
+}
+
+function createPaginationButton(text, isEnabled, page) {
+    const li = document.createElement('li');
+    li.className = 'page-item' + (isEnabled ? '' : ' disabled');
+    const a = document.createElement('a');
+    a.className = 'page-link';
+    a.href = '#';
+    a.textContent = text;
+    if (isEnabled) {
+        a.onclick = () => {
+            getAllNotes(page);
+        };
+    } else {
+        a.onclick = (event) => {
+            event.preventDefault();
+        };
+    }
+    li.appendChild(a);
+    return li;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('createNoteForm').addEventListener('submit', async (event) => {
