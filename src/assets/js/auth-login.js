@@ -43,7 +43,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
 
         localStorage.setItem('token', token);
 
-        window.location.href = './dashboard.html';
+        window.location.href = './index.html';
     } catch (error) {
         console.error('Login error:', error.message);
 

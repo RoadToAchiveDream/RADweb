@@ -72,7 +72,7 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
 
         localStorage.setItem('token', token);
 
-        window.location.href = './user-profile.html';
+        window.location.href = './index.html';
     } catch (error) {
         console.error('Error:', error.message);
         clearAlerts();
