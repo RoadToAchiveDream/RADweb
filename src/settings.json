@@ -1,3 +1,3 @@
 {
-    "apiBaseUrl": "https://radwebapi.onrender.com/api"
+    "apiBaseUrl": "https://localhost:7065/api"
 }
